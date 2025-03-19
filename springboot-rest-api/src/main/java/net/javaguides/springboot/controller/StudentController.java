@@ -1,6 +1,7 @@
 package net.javaguides.springboot.controller;
 
 import net.javaguides.springboot.bean.Student;
+import net.javaguides.springboot.bean.StudentId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -45,6 +46,15 @@ public class StudentController {
                                        @PathVariable("first-name") String firstName,
                                        @PathVariable("last-name") String lastName){
         Student student = new Student(studentId, firstName, lastName);
+        return ResponseEntity.ok(student);
+    }
+
+    // Spring BOOT REST API with Path Variable
+    // {id} - URI template variable
+    // http://localhost:8080/students/1
+    @GetMapping("{id}")
+    public ResponseEntity<Student> studentPathVariableById(@PathVariable("id") int studentId){
+        Student student = new Student(studentId, "Lokasis", "Ghorai");
         return ResponseEntity.ok(student);
     }
 
