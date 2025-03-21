@@ -141,6 +141,19 @@ public class StudentController {
         return ResponseEntity.ok(student);
     }
 
+    //http://localhost:8080/students/partialUpdate?id=100&&firstName=Ramesh&&lastName=Howrah
+    @PutMapping("partialUpdate")
+    public ResponseEntity<CreateStudentObjectResponse> updateStudentPartially(
+            @RequestParam (defaultValue = "1") Integer id,
+            @RequestParam (defaultValue = "Lokasis") String firstName,
+            @RequestParam (defaultValue = "Ghorai") String lastName) {
+        Student student =  new Student(id, firstName, lastName);
+        response.setStudent(student);
+        response.setMessage("Student updated successfully");
+        return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
+    }
+
+
     // Spring boot REST API that handles HTTP DELETE Request - deleting the existing resource
     @DeleteMapping("{id}/delete")
     public ResponseEntity<String> deleteStudent(@PathVariable("id") int studentId){
