@@ -1,18 +1,23 @@
 package net.javaguides.springboot.controller;
 
 import net.javaguides.springboot.bean.Student;
+import net.javaguides.springboot.bean.CreateStudentObjectResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @RestController
 @RequestMapping("students")
 public class StudentController {
 
-    // http://localhost:8080/student
+    @Autowired
+    private CreateStudentObjectResponse response;
+    // http://localhost:8080/students/student
     @GetMapping("student")
     public ResponseEntity<Student> getStudent(){
         Student student = new Student(
@@ -26,14 +31,40 @@ public class StudentController {
                 .body(student);
     }
 
-    // http://localhost:8080/students
-    @GetMapping
-    public ResponseEntity<List<Student>> getStudents(){
+    // http://localhost:8080/students/students
+    @GetMapping("students")
+    public ResponseEntity<List<Student>> getStudentList(){
+        Student student = new Student(
+                1,
+                "Ramesh",
+                "Fadatare"
+        );
+
+        Student student1 = new Student(
+                2,
+                "Lokasis",
+                "Ghorai"
+        );
+
+        List<Student> students = List.of(student,student1);
+        // return new ResponseEntity<>(student, HttpStatus.OK);
+        return ResponseEntity.ok()
+                .header("custom-header", "ramesh")
+                .body(students);
+    }
+
+    // http://localhost:8080/students?sortBy=lastName
+    @GetMapping()
+    public ResponseEntity<List<Student>> getStudents(@RequestParam (defaultValue = "id") String sortBy){
         List<Student> students = new ArrayList<>();
         students.add(new Student(1, "Ramesh", "Fadatare"));
         students.add(new Student(2, "umesh", "Fadatare"));
         students.add(new Student(3, "Ram", "Jadhav"));
         students.add(new Student(4, "Sanjay", "Pawar"));
+
+        if ("firstName".equalsIgnoreCase(sortBy)) students.sort(Comparator.comparing(Student::getFirstName));
+        else if ("lastName".equalsIgnoreCase(sortBy)) students.sort(Comparator.comparing(Student::getLastName));
+        else students.sort(Comparator.comparing(Student::getId));
         return ResponseEntity.ok(students);
     }
 
@@ -48,6 +79,15 @@ public class StudentController {
         return ResponseEntity.ok(student);
     }
 
+    // Spring BOOT REST API with Path Variable
+    // {id} - URI template variable
+    // http://localhost:8080/students/1
+    @GetMapping("{id}")
+    public ResponseEntity<Student> studentPathVariableById(@PathVariable("id") int studentId){
+        Student student = new Student(studentId, "Lokasis", "Ghorai");
+        return ResponseEntity.ok(student);
+    }
+
     // Spring boot REST API with Request Param
     //  http://localhost:8080/students/query?id=1&firstName=Ramesh&lastName=Fadatare
     @GetMapping("query")
@@ -58,15 +98,39 @@ public class StudentController {
         return ResponseEntity.ok(student);
     }
 
+    // Spring boot REST API with both PathVariable and Request Param
+    // http://localhost:8080/students/search?id=1&firstName=Lokasis
+    @GetMapping("search")
+    public ResponseEntity<Student> searchStudent(@RequestParam(required = false) Integer id,
+                                                 @RequestParam(required = false) String firstName) {
+
+        Student student;
+        if (id!=null && firstName!=null) student = new Student(id,firstName,"Ghorai");
+        else if (id==null && firstName!=null) student = new Student(2,firstName,"Ghorai");
+        else student = new Student(3,"Lokasis","Ghorai");
+
+        return ResponseEntity.ok(student);
+    }
+
+
+    // http://localhost:8080/students/lastName/Ghorai
+    @GetMapping("lastName/{lastName}")
+    public ResponseEntity<List<Student>> getStudentByLastName(@PathVariable String lastName) {
+        List<Student> students = List.of(new Student(1,"Lokasis",lastName));
+        return ResponseEntity.ok(students);
+    }
+
     // Spring boot REST API that handles HTTP POST Request - creating new resource
     // @PostMapping and @RequestBody
     @PostMapping("create")
     //@ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Student> createStudent(@RequestBody Student student){
+    public ResponseEntity<CreateStudentObjectResponse> createStudent(@RequestBody Student student){
         System.out.println(student.getId());
         System.out.println(student.getFirstName());
         System.out.println(student.getLastName());
-        return new ResponseEntity<>(student, HttpStatus.CREATED);
+        response.setMessage("StudentCreated Successfully");
+        response.setStudent(student);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     // Spring boot REST API that handles HTTP PUT Request - updating existing resource
@@ -76,6 +140,19 @@ public class StudentController {
         System.out.println(student.getLastName());
         return ResponseEntity.ok(student);
     }
+
+    //http://localhost:8080/students/partialUpdate?id=100&&firstName=Ramesh&&lastName=Howrah
+    @PutMapping("partialUpdate")
+    public ResponseEntity<CreateStudentObjectResponse> updateStudentPartially(
+            @RequestParam (defaultValue = "1") Integer id,
+            @RequestParam (defaultValue = "Lokasis") String firstName,
+            @RequestParam (defaultValue = "Ghorai") String lastName) {
+        Student student =  new Student(id, firstName, lastName);
+        response.setStudent(student);
+        response.setMessage("Student updated successfully");
+        return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
+    }
+
 
     // Spring boot REST API that handles HTTP DELETE Request - deleting the existing resource
     @DeleteMapping("{id}/delete")
