@@ -1,18 +1,22 @@
 package net.javaguides.springboot.controller;
 
 import net.javaguides.springboot.bean.Student;
-import net.javaguides.springboot.bean.StudentId;
+import net.javaguides.springboot.bean.CreateStudentObjectResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @RestController
 @RequestMapping("students")
 public class StudentController {
 
+    @Autowired
+    private CreateStudentObjectResponse response;
     // http://localhost:8080/students/student
     @GetMapping("student")
     public ResponseEntity<Student> getStudent(){
@@ -49,14 +53,18 @@ public class StudentController {
                 .body(students);
     }
 
-    // http://localhost:8080/students
-    @GetMapping
-    public ResponseEntity<List<Student>> getStudents(){
+    // http://localhost:8080/students?sortBy=lastName
+    @GetMapping()
+    public ResponseEntity<List<Student>> getStudents(@RequestParam (defaultValue = "id") String sortBy){
         List<Student> students = new ArrayList<>();
         students.add(new Student(1, "Ramesh", "Fadatare"));
         students.add(new Student(2, "umesh", "Fadatare"));
         students.add(new Student(3, "Ram", "Jadhav"));
         students.add(new Student(4, "Sanjay", "Pawar"));
+
+        if ("firstName".equalsIgnoreCase(sortBy)) students.sort(Comparator.comparing(Student::getFirstName));
+        else if ("lastName".equalsIgnoreCase(sortBy)) students.sort(Comparator.comparing(Student::getLastName));
+        else students.sort(Comparator.comparing(Student::getId));
         return ResponseEntity.ok(students);
     }
 
@@ -104,15 +112,25 @@ public class StudentController {
         return ResponseEntity.ok(student);
     }
 
+
+    // http://localhost:8080/students/lastName/Ghorai
+    @GetMapping("lastName/{lastName}")
+    public ResponseEntity<List<Student>> getStudentByLastName(@PathVariable String lastName) {
+        List<Student> students = List.of(new Student(1,"Lokasis",lastName));
+        return ResponseEntity.ok(students);
+    }
+
     // Spring boot REST API that handles HTTP POST Request - creating new resource
     // @PostMapping and @RequestBody
     @PostMapping("create")
     //@ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Student> createStudent(@RequestBody Student student){
+    public ResponseEntity<CreateStudentObjectResponse> createStudent(@RequestBody Student student){
         System.out.println(student.getId());
         System.out.println(student.getFirstName());
         System.out.println(student.getLastName());
-        return new ResponseEntity<>(student, HttpStatus.CREATED);
+        response.setMessage("StudentCreated Successfully");
+        response.setStudent(student);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     // Spring boot REST API that handles HTTP PUT Request - updating existing resource
