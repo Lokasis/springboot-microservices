@@ -13,7 +13,7 @@ import java.util.List;
 @RequestMapping("students")
 public class StudentController {
 
-    // http://localhost:8080/student
+    // http://localhost:8080/students/student
     @GetMapping("student")
     public ResponseEntity<Student> getStudent(){
         Student student = new Student(
@@ -25,6 +25,28 @@ public class StudentController {
         return ResponseEntity.ok()
                 .header("custom-header", "ramesh")
                 .body(student);
+    }
+
+    // http://localhost:8080/students/students
+    @GetMapping("students")
+    public ResponseEntity<List<Student>> getStudentList(){
+        Student student = new Student(
+                1,
+                "Ramesh",
+                "Fadatare"
+        );
+
+        Student student1 = new Student(
+                2,
+                "Lokasis",
+                "Ghorai"
+        );
+
+        List<Student> students = List.of(student,student1);
+        // return new ResponseEntity<>(student, HttpStatus.OK);
+        return ResponseEntity.ok()
+                .header("custom-header", "ramesh")
+                .body(students);
     }
 
     // http://localhost:8080/students
@@ -65,6 +87,20 @@ public class StudentController {
                                           @RequestParam String firstName,
                                           @RequestParam String lastName){
         Student student = new Student(id, firstName, lastName);
+        return ResponseEntity.ok(student);
+    }
+
+    // Spring boot REST API with both PathVariable and Request Param
+    // http://localhost:8080/students/search?id=1&firstName=Lokasis
+    @GetMapping("search")
+    public ResponseEntity<Student> searchStudent(@RequestParam(required = false) Integer id,
+                                                 @RequestParam(required = false) String firstName) {
+
+        Student student;
+        if (id!=null && firstName!=null) student = new Student(id,firstName,"Ghorai");
+        else if (id==null && firstName!=null) student = new Student(2,firstName,"Ghorai");
+        else student = new Student(3,"Lokasis","Ghorai");
+
         return ResponseEntity.ok(student);
     }
 
