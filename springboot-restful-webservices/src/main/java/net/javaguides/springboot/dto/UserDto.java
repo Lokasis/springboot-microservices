@@ -41,4 +41,12 @@ public class UserDto {
     @NotEmpty(message = "User email should not be null or empty")
     @Email(message = "Email address should be valid")
     private String email;
+
+    @Schema(
+            description = "User Contact Number"
+    )
+    // User Contact Number Should not be null or empty
+    // Phone number should be of 10 digits
+    @NotEmpty(message = "User Contact number must not be null or empty")
+    private String phoneNumber;
 }
