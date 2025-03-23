@@ -12,7 +12,8 @@ public class UserMapper {
                 user.getFirstName(),
                 user.getLastName(),
                 user.getEmail(),
-                user.getPhoneNumber()
+                user.getPhoneNumber(),
+                user.getIsDeleted()
         );
         return userDto;
     }
@@ -24,7 +25,8 @@ public class UserMapper {
                 userDto.getFirstName(),
                 userDto.getLastName(),
                 userDto.getEmail(),
-                userDto.getPhoneNumber()
+                userDto.getPhoneNumber(),
+                userDto.getIsDeleted()
         );
         return user;
     }

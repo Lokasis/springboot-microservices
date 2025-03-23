@@ -105,7 +105,10 @@ public class UserController {
     // Build Delete User REST API
     @DeleteMapping("{id}")
     public ResponseEntity<String> deleteUser(@PathVariable("id") Long userId){
-        userService.deleteUser(userId);
+        UserDto user = userService.getUserById(userId);
+        if (user.getIsDeleted()) return new ResponseEntity<>("User already deleted previously", HttpStatus.OK);
+        user.setIsDeleted(true);
+        userService.updateUser(user);
         return new ResponseEntity<>("User successfully deleted!", HttpStatus.OK);
     }
 

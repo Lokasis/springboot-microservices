@@ -49,4 +49,10 @@ public class UserDto {
     // Phone number should be of 10 digits
     @NotEmpty(message = "User Contact number must not be null or empty")
     private String phoneNumber;
+
+    @Schema(
+            description = "Delete Flag"
+    )
+
+    private Boolean isDeleted;
 }

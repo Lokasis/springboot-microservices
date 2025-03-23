@@ -57,8 +57,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUserById(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new ResourceNotFoundException("User", "id", userId)
+        User user = userRepository
+                .findById(userId)
+                .filter(u-> u.getIsDeleted()==null || !u.getIsDeleted())
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId)
         );
         //return UserMapper.mapToUserDto(user);
         //return modelMapper.map(user, UserDto.class);
@@ -88,6 +90,7 @@ public class UserServiceImpl implements UserService {
         existingUser.setFirstName(user.getFirstName());
         existingUser.setLastName(user.getLastName());
         existingUser.setEmail(user.getEmail());
+        existingUser.setIsDeleted(user.getIsDeleted());
         User updatedUser = userRepository.save(existingUser);
         //return UserMapper.mapToUserDto(updatedUser);
         //return modelMapper.map(updatedUser, UserDto.class);

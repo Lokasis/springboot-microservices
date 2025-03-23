@@ -25,4 +25,6 @@ public class User {
     private String email;
     @Column(unique = true)
     private String phoneNumber;
+    @Column
+    private Boolean isDeleted;
 }
