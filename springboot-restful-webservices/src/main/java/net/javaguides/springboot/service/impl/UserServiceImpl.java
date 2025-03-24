@@ -6,6 +6,7 @@ import net.javaguides.springboot.dto.UserUpdateRequest;
 import net.javaguides.springboot.entity.User;
 import net.javaguides.springboot.exception.EmailAlreadyExistsException;
 import net.javaguides.springboot.exception.ResourceNotFoundException;
+import net.javaguides.springboot.exception.UserSoftDeletedException;
 import net.javaguides.springboot.helper.UpdateRequestHandler;
 import net.javaguides.springboot.mapper.AutoUserMapper;
 import net.javaguides.springboot.mapper.UserMapper;
@@ -39,9 +40,11 @@ public class UserServiceImpl implements UserService {
 
         //User user = modelMapper.map(userDto, User.class);
 
-        Optional<User> optionalUser = userRepository.findByEmail(userDto.getEmail());
+        if(userRepository.findByEmailAndIsDeletedTrue(userDto.getEmail()).isPresent()) {
+            throw new UserSoftDeletedException("User with this email had already exists but was already deleted");
+        }
 
-        if(optionalUser.isPresent()){
+        if(userRepository.findByEmail(userDto.getEmail()).isPresent()){
             throw new EmailAlreadyExistsException("Email Already Exists for User");
         }
 

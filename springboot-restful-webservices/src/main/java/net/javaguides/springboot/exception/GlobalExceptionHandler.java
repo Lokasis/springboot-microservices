@@ -78,4 +78,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(UserSoftDeletedException.class)
+    protected ResponseEntity<ErrorDetails> handleUserSoftDeletedException(UserSoftDeletedException ex, WebRequest request) {
+        ErrorDetails err =  new ErrorDetails(
+        LocalDateTime.now(),
+                ex.getMessage(),
+                request.getDescription(false),
+                "USER SOFT DELETED");
+        return new ResponseEntity<>(err, HttpStatus.BAD_REQUEST);
+
+    }
 }
