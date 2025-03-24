@@ -139,11 +139,8 @@ public class UserController {
     // Build Delete User REST API
     @DeleteMapping("{id}")
     public ResponseEntity<String> deleteUser(@PathVariable("id") Long userId){
-        UserDto user = userService.getUserById(userId);
-        if (user.getIsDeleted()) return new ResponseEntity<>("User already deleted previously", HttpStatus.OK);
-        user.setIsDeleted(true);
-       // userService.updateUser(userId);
-        return new ResponseEntity<>("User successfully deleted!", HttpStatus.OK);
+            userService.deleteUser(userId);
+            return new ResponseEntity<>("User successfully deleted!", HttpStatus.OK);
     }
 
 //    @ExceptionHandler(ResourceNotFoundException.class)

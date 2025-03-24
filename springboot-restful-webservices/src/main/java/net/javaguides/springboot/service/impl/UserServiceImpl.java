@@ -92,7 +92,7 @@ public class UserServiceImpl implements UserService {
         );
 
         User user = updateRequestHandler.createUserDto(request, existingUser);
-        User updatedUser = userRepository.save(existingUser);
+        User updatedUser = userRepository.save(user);
         //return UserMapper.mapToUserDto(updatedUser);
         //return modelMapper.map(updatedUser, UserDto.class);
         return AutoUserMapper.MAPPER.mapToUserDto(updatedUser);
@@ -101,10 +101,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(Long userId) {
 
-        User existingUser = userRepository.findById(userId).orElseThrow(
-                () -> new ResourceNotFoundException("User", "id", userId)
-        );
-
-        userRepository.deleteById(userId);
+        UserDto existingUser = getUserById(userId);
+        User user = AutoUserMapper.MAPPER.mapToUser(existingUser);
+        user.setIsDeleted(true);
+        userRepository.save(user);
     }
 }
