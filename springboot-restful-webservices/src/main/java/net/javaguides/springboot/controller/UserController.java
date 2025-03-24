@@ -5,7 +5,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import net.javaguides.springboot.dto.EmailUpdateRequest;
 import net.javaguides.springboot.dto.UserDto;
+import net.javaguides.springboot.dto.UserUpdateRequest;
 import net.javaguides.springboot.entity.User;
 import net.javaguides.springboot.exception.ErrorDetails;
 import net.javaguides.springboot.exception.ResourceNotFoundException;
@@ -68,6 +70,39 @@ public class UserController {
             responseCode = "200",
             description = "HTTP Status 200 SUCCESS"
     )
+
+    //Build Get All Active Users REST API
+    // http://localhost:8080/api/users/active
+    @GetMapping("active")
+    public  ResponseEntity<List<UserDto>> getAllActiveUsers() {
+        List<UserDto> users = userService.getAllUsers();
+//        List<UserDto> activeUsers = users.stream().filter(u -> u.getIsDeleted()==null || !u.getIsDeleted()).toList();
+        List<UserDto> activeUsers = users.stream().filter(u ->  Boolean.FALSE.equals(u.getIsDeleted())).toList(); //move to service layer
+        return new ResponseEntity<>(activeUsers, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Retrieve active users",
+            description = "Fetch all the users where isDeleted is false or null "
+    )
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "HTTP Status 200 SUCCESS"
+    )
+
+//    //PATCH API to update only email
+//    // http://localhost:8080/api/users/updateEmail
+//    @PatchMapping("updateEmail/{id}")
+//    public ResponseEntity<UserDto> updateEmail(@PathVariable("id") Long userId,
+//                                               @RequestBody final EmailUpdateRequest email){
+//        UserDto user = userService.getUserById(userId);
+//        user.setEmail(email.getEmail());
+//        UserDto updatedUser = userService
+//        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+//    }
+
+
     // Build Get All Users REST API
     // http://localhost:8080/api/users
     @GetMapping
@@ -88,9 +123,8 @@ public class UserController {
     @PutMapping("{id}")
     // http://localhost:8080/api/users/1
     public ResponseEntity<UserDto> updateUser(@PathVariable("id") Long userId,
-                                           @RequestBody @Valid UserDto user){
-        user.setId(userId);
-        UserDto updatedUser = userService.updateUser(user);
+                                           @RequestBody UserUpdateRequest request){
+        UserDto updatedUser = userService.updateUser(userId, request);
         return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
 
@@ -108,7 +142,7 @@ public class UserController {
         UserDto user = userService.getUserById(userId);
         if (user.getIsDeleted()) return new ResponseEntity<>("User already deleted previously", HttpStatus.OK);
         user.setIsDeleted(true);
-        userService.updateUser(user);
+       // userService.updateUser(userId);
         return new ResponseEntity<>("User successfully deleted!", HttpStatus.OK);
     }
 

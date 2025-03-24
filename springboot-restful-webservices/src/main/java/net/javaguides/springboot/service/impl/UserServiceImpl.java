@@ -2,9 +2,11 @@ package net.javaguides.springboot.service.impl;
 
 import lombok.AllArgsConstructor;
 import net.javaguides.springboot.dto.UserDto;
+import net.javaguides.springboot.dto.UserUpdateRequest;
 import net.javaguides.springboot.entity.User;
 import net.javaguides.springboot.exception.EmailAlreadyExistsException;
 import net.javaguides.springboot.exception.ResourceNotFoundException;
+import net.javaguides.springboot.helper.UpdateRequestHandler;
 import net.javaguides.springboot.mapper.AutoUserMapper;
 import net.javaguides.springboot.mapper.UserMapper;
 import net.javaguides.springboot.repository.UserRepository;
@@ -26,6 +28,8 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     private ModelMapper modelMapper;
+
+    private UpdateRequestHandler updateRequestHandler;
 
     @Override
     public UserDto createUser(UserDto userDto) {
@@ -81,16 +85,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto updateUser(UserDto user) {
+    public UserDto updateUser(Long userId, UserUpdateRequest request) {
 
-        User existingUser = userRepository.findById(user.getId()).orElseThrow(
-                () -> new ResourceNotFoundException("User", "id", user.getId())
+        User existingUser = userRepository.findById(userId).orElseThrow(
+                () -> new ResourceNotFoundException("User", "id", userId)
         );
 
-        existingUser.setFirstName(user.getFirstName());
-        existingUser.setLastName(user.getLastName());
-        existingUser.setEmail(user.getEmail());
-        existingUser.setIsDeleted(user.getIsDeleted());
+        User user = updateRequestHandler.createUserDto(request, existingUser);
         User updatedUser = userRepository.save(existingUser);
         //return UserMapper.mapToUserDto(updatedUser);
         //return modelMapper.map(updatedUser, UserDto.class);
