@@ -1,7 +1,7 @@
 package net.javaguides.springboot.mapper;
 
 import net.javaguides.springboot.dto.UserDto;
-import net.javaguides.springboot.entity.User;
+import net.javaguides.springboot.model.User;
 
 public class UserMapper {
 
@@ -13,7 +13,8 @@ public class UserMapper {
                 user.getLastName(),
                 user.getEmail(),
                 user.getPhoneNumber(),
-                user.getIsDeleted()
+                user.getIsDeleted(),
+                user.getRole()
         );
         return userDto;
     }
@@ -26,7 +27,8 @@ public class UserMapper {
                 userDto.getLastName(),
                 userDto.getEmail(),
                 userDto.getPhoneNumber(),
-                userDto.getIsDeleted()
+                userDto.getIsDeleted(),
+                userDto.getUserRole()
         );
         return user;
     }

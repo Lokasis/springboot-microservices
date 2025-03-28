@@ -1,4 +1,4 @@
-package net.javaguides.springboot.entity;
+package net.javaguides.springboot.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -27,4 +27,6 @@ public class User {
     private String phoneNumber;
     @Column
     private Boolean isDeleted;
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
 }

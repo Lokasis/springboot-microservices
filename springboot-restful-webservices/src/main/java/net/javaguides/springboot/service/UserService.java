@@ -2,7 +2,8 @@ package net.javaguides.springboot.service;
 
 import net.javaguides.springboot.dto.UserDto;
 import net.javaguides.springboot.dto.UserUpdateRequest;
-import net.javaguides.springboot.entity.User;
+import net.javaguides.springboot.model.UserRole;
+import net.javaguides.springboot.strategy.UserRoleHandler;
 
 import java.util.List;
 
@@ -16,4 +17,6 @@ public interface UserService {
     UserDto updateUser(Long userId, UserUpdateRequest request);
 
     void deleteUser(Long userId);
+
+    UserRoleHandler getUserRoleHandler(UserRole userRole);
 }

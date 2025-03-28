@@ -1,7 +1,7 @@
 package net.javaguides.springboot.helper;
 
 import net.javaguides.springboot.dto.UserUpdateRequest;
-import net.javaguides.springboot.entity.User;
+import net.javaguides.springboot.model.User;
 import org.springframework.stereotype.Component;
 
 @Component

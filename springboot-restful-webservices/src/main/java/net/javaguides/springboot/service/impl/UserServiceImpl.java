@@ -3,23 +3,21 @@ package net.javaguides.springboot.service.impl;
 import lombok.AllArgsConstructor;
 import net.javaguides.springboot.dto.UserDto;
 import net.javaguides.springboot.dto.UserUpdateRequest;
-import net.javaguides.springboot.entity.User;
+import net.javaguides.springboot.factory.UserRoleHandlerFactory;
+import net.javaguides.springboot.model.User;
 import net.javaguides.springboot.exception.EmailAlreadyExistsException;
 import net.javaguides.springboot.exception.ResourceNotFoundException;
 import net.javaguides.springboot.exception.UserSoftDeletedException;
 import net.javaguides.springboot.helper.UpdateRequestHandler;
 import net.javaguides.springboot.mapper.AutoUserMapper;
-import net.javaguides.springboot.mapper.UserMapper;
+import net.javaguides.springboot.model.UserRole;
 import net.javaguides.springboot.repository.UserRepository;
 import net.javaguides.springboot.service.UserService;
-import org.apache.logging.log4j.util.Strings;
+import net.javaguides.springboot.strategy.UserRoleHandler;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,6 +29,8 @@ public class UserServiceImpl implements UserService {
     private ModelMapper modelMapper;
 
     private UpdateRequestHandler updateRequestHandler;
+
+    private UserRoleHandlerFactory userRoleHandlerFactory;
 
     @Override
     public UserDto createUser(UserDto userDto) {
@@ -61,6 +61,8 @@ public class UserServiceImpl implements UserService {
 
         return savedUserDto;
     }
+
+
 
     @Override
     public UserDto getUserById(Long userId) {
@@ -108,5 +110,10 @@ public class UserServiceImpl implements UserService {
         User user = AutoUserMapper.MAPPER.mapToUser(existingUser);
         user.setIsDeleted(true);
         userRepository.save(user);
+    }
+
+    @Override
+    public UserRoleHandler getUserRoleHandler(UserRole userRole) {
+        return userRoleHandlerFactory.getUserRoleHandler(userRole);
     }
 }

@@ -1,6 +1,6 @@
 package net.javaguides.springboot.repository;
 
-import net.javaguides.springboot.entity.User;
+import net.javaguides.springboot.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

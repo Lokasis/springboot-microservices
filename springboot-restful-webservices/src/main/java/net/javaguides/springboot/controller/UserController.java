@@ -5,19 +5,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import net.javaguides.springboot.dto.EmailUpdateRequest;
 import net.javaguides.springboot.dto.UserDto;
 import net.javaguides.springboot.dto.UserUpdateRequest;
-import net.javaguides.springboot.entity.User;
-import net.javaguides.springboot.exception.ErrorDetails;
-import net.javaguides.springboot.exception.ResourceNotFoundException;
+import net.javaguides.springboot.model.UserRole;
 import net.javaguides.springboot.service.UserService;
+import net.javaguides.springboot.strategy.UserHandler;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.WebRequest;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Tag(
@@ -30,6 +26,8 @@ import java.util.List;
 public class UserController {
 
     private UserService userService;
+
+    private UserHandler userHandler;
 
     @Operation(
             summary = "Create User REST API",
@@ -141,6 +139,12 @@ public class UserController {
     public ResponseEntity<String> deleteUser(@PathVariable("id") Long userId){
             userService.deleteUser(userId);
             return new ResponseEntity<>("User successfully deleted!", HttpStatus.OK);
+    }
+
+    @GetMapping("/role-action")
+    public ResponseEntity<String> handleRoleAction(@RequestParam UserRole role) {
+        userService.getUserRoleHandler(role);
+        return new ResponseEntity<>("Action processed for role: " + role, HttpStatus.ACCEPTED);
     }
 
 //    @ExceptionHandler(ResourceNotFoundException.class)

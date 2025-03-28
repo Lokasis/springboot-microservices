@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import net.javaguides.springboot.model.UserRole;
 
 @Schema(
         description = "UserDto Model Information"
@@ -55,4 +56,6 @@ public class UserDto {
     )
 
     private Boolean isDeleted;
+
+    private UserRole userRole;
 }
