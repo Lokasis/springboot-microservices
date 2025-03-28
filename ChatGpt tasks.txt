@@ -1,0 +1,41 @@
+Task 2: Apply Strategy Pattern for Soft Delete Handling
+💡 Goal: Avoid if-else clutter for handling soft-deleted vs. active users.
+
+🔹 Current Issue: Your service might have if (isDeleted) conditions spread across methods, making it harder to maintain.
+
+🔹 Task Steps:
+
+Define an interface UserRetrievalStrategy with a method findUserByEmail(String email).
+
+Implement two classes:
+
+ActiveUserRetrievalStrategy → Fetches only active users.
+
+SoftDeletedUserRetrievalStrategy → Handles soft-deleted users.
+
+Inject the correct strategy dynamically in your service layer.
+
+🔹 Expected Outcome:
+
+No if-else conditions in service methods.
+
+Easy to extend if new retrieval strategies are needed.
+
+Task 3: Refactor Exception Handling to Follow Open-Closed Principle (OCP)
+💡 Goal: Make exception handling extensible without modifying existing code.
+
+🔹 Current Issue: Your @ExceptionHandler methods are likely hardcoded, meaning adding new exceptions requires modifying the same class.
+
+🔹 Task Steps:
+
+Convert your @ExceptionHandler methods into a generic exception resolver.
+
+Use a map of exception types to error codes instead of multiple @ExceptionHandler methods.
+
+Ensure new exception types can be added without modifying existing code.
+
+🔹 Expected Outcome:
+
+Clean, extensible exception handling.
+
+Easier debugging and better maintainability.
