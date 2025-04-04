@@ -147,17 +147,9 @@ public class UserController {
         return new ResponseEntity<>("Action processed for role: " + role, HttpStatus.ACCEPTED);
     }
 
-//    @ExceptionHandler(ResourceNotFoundException.class)
-//    public ResponseEntity<ErrorDetails> handleResourceNotFoundException(ResourceNotFoundException exception,
-//                                                                        WebRequest webRequest){
-//
-//        ErrorDetails errorDetails = new ErrorDetails(
-//                LocalDateTime.now(),
-//                exception.getMessage(),
-//                webRequest.getDescription(false),
-//                "USER_NOT_FOUND"
-//        );
-//
-//        return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
-//    }
+    @PostMapping("/{userId}/perform-action")
+    public ResponseEntity<String> performAction(@PathVariable Long userId, @RequestParam UserRole role) {
+        userService.performUserAction(userId, role);
+        return ResponseEntity.ok("Action logged for userId: " + userId);
+    }
 }

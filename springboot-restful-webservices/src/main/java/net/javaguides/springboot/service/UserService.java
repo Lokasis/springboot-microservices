@@ -19,4 +19,6 @@ public interface UserService {
     void deleteUser(Long userId);
 
     UserRoleHandler getUserRoleHandler(UserRole userRole);
+
+    void performUserAction(Long userId, UserRole role);
 }

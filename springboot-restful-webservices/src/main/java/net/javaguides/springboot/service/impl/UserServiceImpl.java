@@ -116,4 +116,10 @@ public class UserServiceImpl implements UserService {
     public UserRoleHandler getUserRoleHandler(UserRole userRole) {
         return userRoleHandlerFactory.getUserRoleHandler(userRole);
     }
+
+    @Override
+    public void performUserAction(Long userId, UserRole role) {
+        UserRoleHandler handler = getUserRoleHandler(role);
+        handler.performUserSpecificAction(userId);
+    }
 }
