@@ -6,10 +6,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 @AllArgsConstructor
-public class AdminNotificationHandler implements NotificationHandler {
-
+public class ModeratorNotificationHandler implements NotificationHandler {
     @Override
     public String handleNotification(NotificationRequestDto request) {
-        return "Admin fucked you";
+        return "Moderator fucked you";
     }
 }

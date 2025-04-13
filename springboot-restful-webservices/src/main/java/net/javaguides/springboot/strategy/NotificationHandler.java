@@ -1,8 +1,8 @@
 package net.javaguides.springboot.strategy;
 
-import net.javaguides.springboot.model.UserRole;
+import net.javaguides.springboot.dto.NotificationRequestDto;
 
 public interface NotificationHandler {
 
-    void handleNotification(UserRole user);
+    String handleNotification(NotificationRequestDto request);
 }
