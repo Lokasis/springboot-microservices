@@ -6,16 +6,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import net.javaguides.springboot.dto.UserDto;
-import net.javaguides.springboot.entity.User;
-import net.javaguides.springboot.exception.ErrorDetails;
-import net.javaguides.springboot.exception.ResourceNotFoundException;
+import net.javaguides.springboot.dto.UserUpdateRequest;
+import net.javaguides.springboot.model.UserRole;
 import net.javaguides.springboot.service.UserService;
+import net.javaguides.springboot.strategy.UserHandler;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.WebRequest;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Tag(
@@ -28,6 +26,8 @@ import java.util.List;
 public class UserController {
 
     private UserService userService;
+
+    private UserHandler userHandler;
 
     @Operation(
             summary = "Create User REST API",
@@ -68,6 +68,39 @@ public class UserController {
             responseCode = "200",
             description = "HTTP Status 200 SUCCESS"
     )
+
+    //Build Get All Active Users REST API
+    // http://localhost:8080/api/users/active
+    @GetMapping("active")
+    public  ResponseEntity<List<UserDto>> getAllActiveUsers() {
+        List<UserDto> users = userService.getAllUsers();
+//        List<UserDto> activeUsers = users.stream().filter(u -> u.getIsDeleted()==null || !u.getIsDeleted()).toList();
+        List<UserDto> activeUsers = users.stream().filter(u ->  Boolean.FALSE.equals(u.getIsDeleted())).toList(); //move to service layer
+        return new ResponseEntity<>(activeUsers, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Retrieve active users",
+            description = "Fetch all the users where isDeleted is false or null "
+    )
+
+    @ApiResponse(
+            responseCode = "200",
+            description = "HTTP Status 200 SUCCESS"
+    )
+
+//    //PATCH API to update only email
+//    // http://localhost:8080/api/users/updateEmail
+//    @PatchMapping("updateEmail/{id}")
+//    public ResponseEntity<UserDto> updateEmail(@PathVariable("id") Long userId,
+//                                               @RequestBody final EmailUpdateRequest email){
+//        UserDto user = userService.getUserById(userId);
+//        user.setEmail(email.getEmail());
+//        UserDto updatedUser = userService
+//        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+//    }
+
+
     // Build Get All Users REST API
     // http://localhost:8080/api/users
     @GetMapping
@@ -88,9 +121,8 @@ public class UserController {
     @PutMapping("{id}")
     // http://localhost:8080/api/users/1
     public ResponseEntity<UserDto> updateUser(@PathVariable("id") Long userId,
-                                           @RequestBody @Valid UserDto user){
-        user.setId(userId);
-        UserDto updatedUser = userService.updateUser(user);
+                                           @RequestBody UserUpdateRequest request){
+        UserDto updatedUser = userService.updateUser(userId, request);
         return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
 
@@ -105,21 +137,19 @@ public class UserController {
     // Build Delete User REST API
     @DeleteMapping("{id}")
     public ResponseEntity<String> deleteUser(@PathVariable("id") Long userId){
-        userService.deleteUser(userId);
-        return new ResponseEntity<>("User successfully deleted!", HttpStatus.OK);
+            userService.deleteUser(userId);
+            return new ResponseEntity<>("User successfully deleted!", HttpStatus.OK);
     }
 
-//    @ExceptionHandler(ResourceNotFoundException.class)
-//    public ResponseEntity<ErrorDetails> handleResourceNotFoundException(ResourceNotFoundException exception,
-//                                                                        WebRequest webRequest){
-//
-//        ErrorDetails errorDetails = new ErrorDetails(
-//                LocalDateTime.now(),
-//                exception.getMessage(),
-//                webRequest.getDescription(false),
-//                "USER_NOT_FOUND"
-//        );
-//
-//        return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
-//    }
+    @GetMapping("/role-action")
+    public ResponseEntity<String> handleRoleAction(@RequestParam UserRole role) {
+        userService.getUserRoleHandler(role);
+        return new ResponseEntity<>("Action processed for role: " + role, HttpStatus.ACCEPTED);
+    }
+
+    @PostMapping("/{userId}/perform-action")
+    public ResponseEntity<String> performAction(@PathVariable Long userId, @RequestParam UserRole role) {
+        userService.performUserAction(userId, role);
+        return ResponseEntity.ok("Action logged for userId: " + userId);
+    }
 }

@@ -2,21 +2,22 @@ package net.javaguides.springboot.service.impl;
 
 import lombok.AllArgsConstructor;
 import net.javaguides.springboot.dto.UserDto;
-import net.javaguides.springboot.entity.User;
+import net.javaguides.springboot.dto.UserUpdateRequest;
+import net.javaguides.springboot.factory.UserRoleHandlerFactory;
+import net.javaguides.springboot.model.User;
 import net.javaguides.springboot.exception.EmailAlreadyExistsException;
 import net.javaguides.springboot.exception.ResourceNotFoundException;
+import net.javaguides.springboot.exception.UserSoftDeletedException;
+import net.javaguides.springboot.helper.UpdateRequestHandler;
 import net.javaguides.springboot.mapper.AutoUserMapper;
-import net.javaguides.springboot.mapper.UserMapper;
+import net.javaguides.springboot.model.UserRole;
 import net.javaguides.springboot.repository.UserRepository;
 import net.javaguides.springboot.service.UserService;
-import org.apache.logging.log4j.util.Strings;
+import net.javaguides.springboot.strategy.UserRoleHandler;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,6 +28,10 @@ public class UserServiceImpl implements UserService {
 
     private ModelMapper modelMapper;
 
+    private UpdateRequestHandler updateRequestHandler;
+
+    private UserRoleHandlerFactory userRoleHandlerFactory;
+
     @Override
     public UserDto createUser(UserDto userDto) {
 
@@ -35,9 +40,11 @@ public class UserServiceImpl implements UserService {
 
         //User user = modelMapper.map(userDto, User.class);
 
-        Optional<User> optionalUser = userRepository.findByEmail(userDto.getEmail());
+        if(userRepository.findByEmailAndIsDeletedTrue(userDto.getEmail()).isPresent()) {
+            throw new UserSoftDeletedException("User with this email had already exists but was already deleted");
+        }
 
-        if(optionalUser.isPresent()){
+        if(userRepository.findByEmail(userDto.getEmail()).isPresent()){
             throw new EmailAlreadyExistsException("Email Already Exists for User");
         }
 
@@ -55,10 +62,14 @@ public class UserServiceImpl implements UserService {
         return savedUserDto;
     }
 
+
+
     @Override
     public UserDto getUserById(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new ResourceNotFoundException("User", "id", userId)
+        User user = userRepository
+                .findById(userId)
+                .filter(u-> u.getIsDeleted()==null || !u.getIsDeleted())
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId)
         );
         //return UserMapper.mapToUserDto(user);
         //return modelMapper.map(user, UserDto.class);
@@ -79,16 +90,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto updateUser(UserDto user) {
+    public UserDto updateUser(Long userId, UserUpdateRequest request) {
 
-        User existingUser = userRepository.findById(user.getId()).orElseThrow(
-                () -> new ResourceNotFoundException("User", "id", user.getId())
+        User existingUser = userRepository.findById(userId).orElseThrow(
+                () -> new ResourceNotFoundException("User", "id", userId)
         );
 
-        existingUser.setFirstName(user.getFirstName());
-        existingUser.setLastName(user.getLastName());
-        existingUser.setEmail(user.getEmail());
-        User updatedUser = userRepository.save(existingUser);
+        User user = updateRequestHandler.createUserDto(request, existingUser);
+        User updatedUser = userRepository.save(user);
         //return UserMapper.mapToUserDto(updatedUser);
         //return modelMapper.map(updatedUser, UserDto.class);
         return AutoUserMapper.MAPPER.mapToUserDto(updatedUser);
@@ -97,10 +106,20 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(Long userId) {
 
-        User existingUser = userRepository.findById(userId).orElseThrow(
-                () -> new ResourceNotFoundException("User", "id", userId)
-        );
+        UserDto existingUser = getUserById(userId);
+        User user = AutoUserMapper.MAPPER.mapToUser(existingUser);
+        user.setIsDeleted(true);
+        userRepository.save(user);
+    }
 
-        userRepository.deleteById(userId);
+    @Override
+    public UserRoleHandler getUserRoleHandler(UserRole userRole) {
+        return userRoleHandlerFactory.getUserRoleHandler(userRole);
+    }
+
+    @Override
+    public void performUserAction(Long userId, UserRole role) {
+        UserRoleHandler handler = getUserRoleHandler(role);
+        handler.performUserSpecificAction(userId);
     }
 }

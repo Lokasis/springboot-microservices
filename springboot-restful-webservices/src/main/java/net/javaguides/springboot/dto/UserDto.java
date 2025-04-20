@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import net.javaguides.springboot.model.UserRole;
 
 @Schema(
         description = "UserDto Model Information"
@@ -41,4 +42,20 @@ public class UserDto {
     @NotEmpty(message = "User email should not be null or empty")
     @Email(message = "Email address should be valid")
     private String email;
+
+    @Schema(
+            description = "User Contact Number"
+    )
+    // User Contact Number Should not be null or empty
+    // Phone number should be of 10 digits
+    @NotEmpty(message = "User Contact number must not be null or empty")
+    private String phoneNumber;
+
+    @Schema(
+            description = "Delete Flag"
+    )
+
+    private Boolean isDeleted;
+
+    private UserRole userRole;
 }
