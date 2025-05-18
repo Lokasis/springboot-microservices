@@ -1,7 +1,7 @@
-package net.javaguides.springboot.controller;
+package net.loanmanagement.controller;
 
-import net.javaguides.springboot.bean.Student;
-import net.javaguides.springboot.bean.CreateStudentObjectResponse;
+import net.loanmanagement.bean.Student;
+import net.loanmanagement.bean.CreateStudentObjectResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

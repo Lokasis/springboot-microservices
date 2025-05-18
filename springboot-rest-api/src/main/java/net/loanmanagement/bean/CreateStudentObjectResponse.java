@@ -1,4 +1,4 @@
-package net.javaguides.springboot.bean;
+package net.loanmanagement.bean;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
