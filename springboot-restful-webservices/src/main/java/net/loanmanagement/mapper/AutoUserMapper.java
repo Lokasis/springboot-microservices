@@ -1,16 +1,14 @@
 package net.loanmanagement.mapper;
 
-import net.loanmanagement.dto.CreateLoanRequest;
-import net.loanmanagement.dto.LoanDto;
-import net.loanmanagement.dto.UserActionDto;
-import net.loanmanagement.dto.UserDto;
+import net.loanmanagement.dto.*;
 import net.loanmanagement.model.Loan;
 import net.loanmanagement.model.User;
 import net.loanmanagement.model.UserAction;
-import org.mapstruct.Mapper;
+import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring",
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface AutoUserMapper {
 
     AutoUserMapper MAPPER = Mappers.getMapper(AutoUserMapper.class);
@@ -26,4 +24,7 @@ public interface AutoUserMapper {
     Loan toLoan(CreateLoanRequest request);
 
     LoanDto toLoanDto(Loan loan);
+
+    @Mapping(target = "borrowerName", ignore = true)
+    Loan updateRequestToLoan(UpdateLoanRequest request, @MappingTarget Loan loan);
 }

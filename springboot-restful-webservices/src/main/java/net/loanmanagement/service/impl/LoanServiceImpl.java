@@ -3,6 +3,7 @@ package net.loanmanagement.service.impl;
 import lombok.AllArgsConstructor;
 import net.loanmanagement.dto.CreateLoanRequest;
 import net.loanmanagement.dto.LoanDto;
+import net.loanmanagement.dto.UpdateLoanRequest;
 import net.loanmanagement.exception.ResourceNotFoundException;
 import net.loanmanagement.mapper.AutoUserMapper;
 import net.loanmanagement.model.Loan;
@@ -62,5 +63,18 @@ public class LoanServiceImpl implements LoanService {
         loan.setIsDeleted(true);
         loanRepository.save(loan);
 
+    }
+
+    @Override
+    public LoanDto updateLoan(Long id, UpdateLoanRequest request) {
+
+        Loan loan = loanRepository.findById(id)
+                .filter(l -> !l.getIsDeleted())
+                .orElseThrow(() -> new ResourceNotFoundException("Loan", "Id", id));
+
+        Loan updatedLoan = AutoUserMapper.MAPPER.updateRequestToLoan(request, loan);
+        loanRepository.save(updatedLoan);
+
+        return AutoUserMapper.MAPPER.toLoanDto(updatedLoan);
     }
 }

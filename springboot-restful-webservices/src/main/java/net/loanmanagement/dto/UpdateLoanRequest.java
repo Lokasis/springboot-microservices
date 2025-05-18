@@ -2,28 +2,24 @@ package net.loanmanagement.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateLoanRequest {
+public class UpdateLoanRequest {
 
     @Schema(
-            description = "Create Loan Request"
+            description = "Update Loan Request"
     )
 
-    @NotBlank(message = "Borrower Name is mandatory")
-    private String borrowerName;
 
-    @NonNull
     @Min(value=1000, message = "Loan amount must be greater or equal to 1000")
     private Double amount;
 
-    private Double interestRate = 10.5;
+    private Double interestRate;
 
     @Min(value=12, message = "Minimum duration is 12 months")
-    private Integer durationMonths = 12;
+    private Integer durationMonths;
 }
